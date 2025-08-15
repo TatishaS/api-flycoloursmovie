@@ -1,6 +1,5 @@
 import express from "express";
 import "dotenv/config";
-import { Request, Response } from "express";
 import mongoose from "mongoose";
 import multer from "multer";
 import fs from "fs";
@@ -12,16 +11,16 @@ import {
   loginValidation,
   bookingCreateValidation,
   activityCreateValidation,
-} from "./src/validations";
+} from "./validations";
 
-import checkAuth from "./src/utils/checkAuth";
-import checkValidationErrors from "./src/utils/checkValidationErrors";
+import checkAuth from "./utils/checkAuth";
+import checkValidationErrors from "./utils/checkValidationErrors";
 
 import {
   UserController,
   BookingController,
   ActivityController,
-} from "./src/controllers/index";
+} from "./controllers/index";
 
 declare global {
   namespace NodeJS {
