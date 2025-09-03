@@ -2,9 +2,9 @@
   "name": "api-cinemate",
   "version": "1.0.0",
   "description": "API for cinema booking service",
-  "main": "index.ts",
+  "main": "index.js",
   "scripts": {
-    "start:dev": "nodemon index.ts",
+    "start:dev": "nodemon ./src/index.ts",
     "start": "node dist/index.js",
     "build": "tsc"
   },
@@ -16,8 +16,10 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.2.1",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
     "nodemon": "^3.1.10",
-    "ts-node-dev": "^2.0.0",
+    "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.2"
   },
@@ -30,6 +32,8 @@
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.17.0",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   }
 }

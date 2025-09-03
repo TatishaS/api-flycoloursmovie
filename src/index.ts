@@ -1,10 +1,10 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import "dotenv/config";
 import mongoose from "mongoose";
 import multer from "multer";
 import fs from "fs";
-
 import helmet from "helmet";
+import { setupDocs } from "./utils/documentation";
 
 import {
   registerValidation,
@@ -58,7 +58,26 @@ const upload = multer({ storage });
 
 app.use(express.json());
 app.use(helmet());
+setupDocs(app);
+
 app.use("/uploads", express.static("uploads"));
+
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     tags:
+ *       - App Routes
+ *     summary: Health check
+ *     description: Basic route to check if the api is running
+ *     responses:
+ *       200:
+ *         description: Server is up and running.
+ */
+
+app.get("/", (req: Request, res: Response) => {
+  res.status(200).send("Welcome to FlyColoursMovie REST API!");
+});
 
 app.post(
   "/auth/login",
@@ -67,6 +86,60 @@ app.post(
   checkValidationErrors,
   UserController.login
 );
+
+/**
+ * @swagger
+ * /auth/register:
+ *   post:
+ *     tags:
+ *       - User Routes
+ *     summary: Регистрация нового пользователя
+ *     description: Берет данные пользователя из body и пытается зарегистировать нового пользователя в базе
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullname:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               group:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User created succesfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 fullname:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 group:
+ *                   type: string
+ *                 role:
+ *                   type: string
+ *                 bookings:
+ *                   type: array
+ *                 "_id":
+ *                   type: string
+ *                 createdAt:
+ *                   type: string
+ *                 updatedAt:
+ *                   type: string
+ *                 token:
+ *                   type: string
+ */
+
 app.post(
   "/auth/register",
   registerValidation,
