@@ -45,6 +45,10 @@ const ActivitySchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    duration: {
+      type: Number,
+      default: 0,
+    },
     occupiedSeats: {
       type: Array,
       default: [],

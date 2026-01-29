@@ -7,6 +7,7 @@ interface CustomJwtPayload extends JwtPayload {
 
 export default (req: Request, res: Response, next: NextFunction) => {
   const token = (req.headers.authorization || "").replace(/Bearer\s?/, "");
+  //const token = (req.headers.authorization || "").split(" ",);
 
   if (token) {
     try {

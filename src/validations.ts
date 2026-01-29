@@ -1,24 +1,35 @@
-import { body } from "express-validator";
+import { body, check } from "express-validator";
 
 export const registerValidation = [
   body("email", "Неверный формат e-mail").isEmail(),
-  body("password", "Длина пароля должна быть не менее 6 символов")
+  check(
+    "password",
+    "Длина пароля должна быть не менее 8 символов и содержать хотя бы 1 латинскую букву, цифры и специальные символы",
+  )
     .isString()
-    .isLength({
-      min: 6,
+    .trim()
+    .isLength({ min: 8, max: 20 })
+    .isStrongPassword({
+      minLength: 8,
+      minLowercase: 1,
+      minUppercase: 1,
+      minNumbers: 1,
+      minSymbols: 1,
     }),
-  body("fullname", "Укажите верное имя").isString().isLength({ min: 2 }),
+  body("fullname", "Укажите верное имя").isString().trim().isLength({ min: 2 }),
   body("group", "Неверный формат группы")
     .optional()
     .isString()
-    .isLength({ min: 2, max: 4 }),
+    .isLength({ min: 2, max: 10 }),
 ];
 
 export const loginValidation = [
   body("email", "Неверный формат e-mail").isEmail(),
-  body("password", "Длина пароля должна быть не менее 6 символов").isLength({
-    min: 6,
-  }),
+  body("password", "Длина пароля должна быть не менее 8 символов")
+    .trim()
+    .isLength({
+      min: 8,
+    }),
 ];
 
 export const bookingCreateValidation = [
@@ -34,12 +45,10 @@ export const activityCreateValidation = [
     min: 2,
   }),
   body("imageUrl", "Неверная ссылка на изображение").isURL(),
-  /*  body("description", "Длина описания должна быть от 10 до 200 символов")
+  body("description", "Длина описания должна быть от 10 до 350 символов")
     .isString()
     .isLength({
       min: 10,
-      max: 200,
+      max: 350,
     }),
-
-   */
 ];

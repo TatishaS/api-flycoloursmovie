@@ -64,6 +64,7 @@ export const create = async (req: Request, res: Response) => {
       time: req.body.time,
       free: req.body.free,
       price: req.body.price,
+      duration: req.body.duration,
     });
 
     const activity = await activityDoc.save();
@@ -96,6 +97,7 @@ export const update = async (req: Request, res: Response) => {
         time: req.body.time,
         free: req.body.free,
         price: req.body.price,
+        duration: req.body.duration,
         occupiedSeats: req.body.occupiedSeats,
       }
     ).exec();
