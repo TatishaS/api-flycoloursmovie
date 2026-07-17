@@ -119,12 +119,18 @@ export const getAll = async (req: Request, res: Response) => {
 export const update = async (req: Request, res: Response) => {
   try {
     const userId = req.params.id;
+
+    if (req.userId !== userId && req.userRole !== "admin") {
+      return res.status(403).json({
+        message: "You can only update your own profile",
+      });
+    }
+
     const user = await UserModel.findOneAndUpdate(
       {
         _id: userId,
       },
       {
-        user: req.userId,
         fullname: req.body.fullname,
         email: req.body.email,
         group: req.body.group,

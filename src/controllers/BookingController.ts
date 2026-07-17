@@ -31,15 +31,21 @@ export const getItem = async (req: Request, res: Response) => {
 export const remove = async (req: Request, res: Response) => {
   try {
     const bookingId = req.params.id;
-    const booking = await BookingModel.findOneAndDelete({
-      _id: bookingId,
-    }).exec();
+    const existing = await BookingModel.findById(bookingId).exec();
 
-    if (!booking) {
+    if (!existing) {
       return res.status(404).json({
         message: "Бронирование не найдено",
       });
     }
+
+    if (existing.user.toString() !== req.userId && req.userRole !== "admin") {
+      return res.status(403).json({
+        message: "Вы можете удалять только свои бронирования",
+      });
+    }
+
+    await BookingModel.findOneAndDelete({ _id: bookingId }).exec();
 
     res.json({
       success: true,
@@ -78,25 +84,30 @@ export const create = async (req: Request, res: Response) => {
 export const update = async (req: Request, res: Response) => {
   try {
     const bookingId = req.params.id;
-    const booking = await BookingModel.findOneAndUpdate(
-      {
-        _id: bookingId,
-      },
-      {
-        user: req.userId,
-        seats: req.body.seats,
-        activity: req.body.activity,
-        activityDate: req.body.activityDate,
-      }
-    ).exec();
+    const existing = await BookingModel.findById(bookingId).exec();
 
-    if (!booking) {
+    if (!existing) {
       return res.status(404).json({
         message: "Бронирование не найдено",
       });
     }
 
-    //const booking = await bookingDoc.save();
+    if (existing.user.toString() !== req.userId && req.userRole !== "admin") {
+      return res.status(403).json({
+        message: "Вы можете изменять только свои бронирования",
+      });
+    }
+
+    await BookingModel.findOneAndUpdate(
+      {
+        _id: bookingId,
+      },
+      {
+        seats: req.body.seats,
+        activity: req.body.activity,
+        activityDate: req.body.activityDate,
+      }
+    ).exec();
 
     res.json({
       success: true,
