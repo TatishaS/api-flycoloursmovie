@@ -15,6 +15,7 @@ import {
 } from "./validations";
 
 import checkAuth from "./utils/checkAuth";
+import checkAdmin from "./utils/checkAdmin";
 import checkValidationErrors from "./utils/checkValidationErrors";
 
 import {
@@ -22,7 +23,6 @@ import {
   BookingController,
   ActivityController,
 } from "./controllers/index";
-import checkAdmin from "./utils/checkAdmin";
 
 declare global {
   namespace NodeJS {
@@ -158,7 +158,7 @@ app.post(
   checkValidationErrors,
   BookingController.create,
 );
-app.get("/bookings", checkAuth, BookingController.getAll); // Переписать на checkAdmin, сделать доступными только админу
+app.get("/bookings", checkAuth, checkAdmin, BookingController.getAll);
 app.get("/bookings/:id", checkAuth, BookingController.getItem);
 app.delete(
   "/bookings/:id",
