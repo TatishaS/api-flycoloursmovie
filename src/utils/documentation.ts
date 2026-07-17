@@ -62,6 +62,7 @@ export function setupDocs(app: Application) {
             date: { type: "string" },
             time: { type: "string" },
             price: { type: "number" },
+            duration: { type: "number" },
             occupiedSeats: {
               type: "array",
               items: {

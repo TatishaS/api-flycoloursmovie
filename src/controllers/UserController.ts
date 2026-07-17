@@ -20,9 +20,13 @@ export const register = async (req: Request, res: Response) => {
 
     const user = await userDoc.save();
 
-    const token = jwt.sign({ _id: user._id }, process.env.SECRET_KEY, {
-      expiresIn: "30d",
-    });
+    const token = jwt.sign(
+      { _id: user._id, role: user.role },
+      process.env.SECRET_KEY,
+      {
+        expiresIn: "30d",
+      },
+    );
     const { passwordHash, ...userData } = user._doc;
 
     res.json({
@@ -32,7 +36,7 @@ export const register = async (req: Request, res: Response) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({
-      message: "Не удалось зарегистрироваться",
+      message: "Authorization failed",
     });
   }
 };
@@ -45,24 +49,28 @@ export const login = async (req: Request, res: Response) => {
 
     if (!user) {
       return res.status(403).json({
-        message: "Неверный логин или пароль",
+        message: "Invalid login or password",
       });
     }
 
     const isPasswordValid = await bcrypt.compare(
       req.body.password,
-      user._doc.passwordHash
+      user._doc.passwordHash,
     );
 
     if (!isPasswordValid) {
       return res.status(403).json({
-        message: "Неверный логин или пароль",
+        message: "Invalid login or password",
       });
     }
 
-    const token = jwt.sign({ _id: user._id }, process.env.SECRET_KEY, {
-      expiresIn: "30d",
-    });
+    const token = jwt.sign(
+      { _id: user._id, role: user.role },
+      process.env.SECRET_KEY,
+      {
+        expiresIn: "30d",
+      },
+    );
 
     const { passwordHash, ...userData } = user._doc;
 
@@ -71,9 +79,8 @@ export const login = async (req: Request, res: Response) => {
       token,
     });
   } catch (error) {
-    console.log("Не удалось авторизоваться");
     return res.status(500).json({
-      message: "Не удалось авторизоваться",
+      message: "Authorization failed",
     });
   }
 };
@@ -84,7 +91,7 @@ export const authMe = async (req: Request, res: Response) => {
 
     if (!user) {
       return res.status(404).json({
-        message: "Пользователь не найден",
+        message: "User not found",
       });
     }
 
@@ -92,7 +99,51 @@ export const authMe = async (req: Request, res: Response) => {
     res.json(userData);
   } catch (error) {
     res.status(403).json({
-      message: "Не удалось авторизоваться",
+      message: "Authorization failed",
+    });
+  }
+};
+
+export const getAll = async (req: Request, res: Response) => {
+  try {
+    const users = await UserModel.find();
+    res.json(users);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Failed to get users",
+    });
+  }
+};
+
+export const update = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.id;
+    const user = await UserModel.findOneAndUpdate(
+      {
+        _id: userId,
+      },
+      {
+        user: req.userId,
+        fullname: req.body.fullname,
+        email: req.body.email,
+        group: req.body.group,
+      },
+    ).exec();
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    res.json({
+      success: true,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "User update failed",
     });
   }
 };

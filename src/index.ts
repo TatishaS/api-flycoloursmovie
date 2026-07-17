@@ -22,6 +22,7 @@ import {
   BookingController,
   ActivityController,
 } from "./controllers/index";
+import checkAdmin from "./utils/checkAdmin";
 
 declare global {
   namespace NodeJS {
@@ -86,7 +87,7 @@ app.post(
 
   loginValidation,
   checkValidationErrors,
-  UserController.login
+  UserController.login,
 );
 
 /**
@@ -146,7 +147,7 @@ app.post(
   "/auth/register",
   registerValidation,
   checkValidationErrors,
-  UserController.register
+  UserController.register,
 );
 app.get("/auth/me", checkAuth, UserController.authMe);
 
@@ -155,7 +156,7 @@ app.post(
   checkAuth,
   bookingCreateValidation,
   checkValidationErrors,
-  BookingController.create
+  BookingController.create,
 );
 app.get("/bookings", checkAuth, BookingController.getAll); // Переписать на checkAdmin, сделать доступными только админу
 app.get("/bookings/:id", checkAuth, BookingController.getItem);
@@ -163,14 +164,14 @@ app.delete(
   "/bookings/:id",
   checkAuth,
   bookingCreateValidation,
-  BookingController.remove
+  BookingController.remove,
 );
 app.patch(
   "/bookings/:id",
   checkAuth,
   bookingCreateValidation,
   checkValidationErrors,
-  BookingController.update
+  BookingController.update,
 ); // Возможно, функция не нужна
 
 app.post("/upload", checkAuth, upload.single("image"), (req, res) => {
@@ -183,7 +184,7 @@ app.post(
   "/activities",
   checkAuth,
   activityCreateValidation,
-  ActivityController.create
+  ActivityController.create,
 );
 app.get("/activities", ActivityController.getAll);
 app.get("/activities/:id", ActivityController.getItem);
@@ -192,8 +193,11 @@ app.patch(
   "/activities/:id",
   checkAuth,
   activityCreateValidation,
-  ActivityController.update
+  ActivityController.update,
 );
+
+app.get("/users", checkAuth, checkAdmin, UserController.getAll);
+app.patch("/users/:id", checkAuth, UserController.update);
 
 app.listen(process.env.PORT || 5555, (error) => {
   if (error) {
