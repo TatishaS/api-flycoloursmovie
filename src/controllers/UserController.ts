@@ -27,7 +27,7 @@ export const register = async (req: Request, res: Response) => {
         expiresIn: "30d",
       },
     );
-    const { passwordHash, ...userData } = user._doc;
+    const { passwordHash, ...userData } = user.toObject();
 
     res.json({
       ...userData,
@@ -55,7 +55,7 @@ export const login = async (req: Request, res: Response) => {
 
     const isPasswordValid = await bcrypt.compare(
       req.body.password,
-      user._doc.passwordHash,
+      user.passwordHash,
     );
 
     if (!isPasswordValid) {
@@ -72,7 +72,7 @@ export const login = async (req: Request, res: Response) => {
       },
     );
 
-    const { passwordHash, ...userData } = user._doc;
+    const { passwordHash, ...userData } = user.toObject();
 
     res.json({
       ...userData,
@@ -95,7 +95,7 @@ export const authMe = async (req: Request, res: Response) => {
       });
     }
 
-    const { passwordHash, ...userData } = user._doc;
+    const { passwordHash, ...userData } = user.toObject();
     res.json(userData);
   } catch (error) {
     res.status(403).json({
@@ -107,7 +107,11 @@ export const authMe = async (req: Request, res: Response) => {
 export const getAll = async (req: Request, res: Response) => {
   try {
     const users = await UserModel.find();
-    res.json(users);
+    const usersData = users.map((user) => {
+      const { passwordHash, ...userData } = user.toObject();
+      return userData;
+    });
+    res.json(usersData);
   } catch (error) {
     console.log(error);
     res.status(500).json({
