@@ -52,3 +52,19 @@ export const activityCreateValidation = [
       max: 350,
     }),
 ];
+
+export const activityUpdateValidation = [
+  body("type", "Выберите тип активности").optional().notEmpty(),
+  body("date", "Укажите дату мероприятия").optional().isDate(),
+  body("title", "Укажите название").optional().isString().isLength({
+    min: 2,
+  }),
+  body("imageUrl", "Неверная ссылка на изображение").optional().isURL(),
+  body("description", "Длина описания должна быть от 10 до 350 символов")
+    .optional()
+    .isString()
+    .isLength({
+      min: 10,
+      max: 350,
+    }),
+];

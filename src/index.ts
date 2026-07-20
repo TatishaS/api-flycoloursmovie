@@ -14,6 +14,7 @@ import {
   loginValidation,
   bookingCreateValidation,
   activityCreateValidation,
+  activityUpdateValidation,
 } from "./validations";
 
 import checkAuth from "./utils/checkAuth";
@@ -232,7 +233,8 @@ app.patch(
   "/activities/:id",
   checkAuth,
   checkAdmin,
-  activityCreateValidation,
+  activityUpdateValidation,
+  checkValidationErrors,
   ActivityController.update,
 );
 
