@@ -1,8 +1,10 @@
 import express, { Request, Response } from "express";
 import "dotenv/config";
 import mongoose from "mongoose";
-import multer from "multer";
+import multer, { FileFilterCallback } from "multer";
 import fs from "fs";
+import path from "path";
+import crypto from "crypto";
 import cors from "cors";
 import helmet from "helmet";
 import { setupDocs } from "./utils/documentation";
@@ -43,6 +45,12 @@ mongoose
 
 const app = express();
 
+const ALLOWED_IMAGE_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+]);
+
 const storage = multer.diskStorage({
   destination: (_, __, callback) => {
     if (!fs.existsSync("uploads")) {
@@ -52,11 +60,27 @@ const storage = multer.diskStorage({
   },
 
   filename: (_, file, callback) => {
-    callback(null, file.originalname);
+    const extension = path.extname(file.originalname);
+    callback(null, `${crypto.randomUUID()}${extension}`);
   },
 });
 
-const upload = multer({ storage });
+const fileFilter = (
+  _req: Request,
+  file: Express.Multer.File,
+  callback: FileFilterCallback,
+) => {
+  if (!ALLOWED_IMAGE_TYPES.has(file.mimetype)) {
+    return callback(new Error("Unsupported file type"));
+  }
+  callback(null, true);
+};
+
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
+});
 
 app.use(express.json());
 app.use(cors());
@@ -176,7 +200,7 @@ app.patch(
 
 app.post("/upload", checkAuth, upload.single("image"), (req, res) => {
   res.json({
-    url: `/uploads/${req.file?.originalname}`,
+    url: `/uploads/${req.file?.filename}`,
   });
 });
 
