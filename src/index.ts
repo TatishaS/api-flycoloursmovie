@@ -216,15 +216,22 @@ app.post("/upload", checkAuth, upload.single("image"), (req, res) => {
 app.post(
   "/activities",
   checkAuth,
+  checkAdmin,
   activityCreateValidation,
   ActivityController.create,
 );
 app.get("/activities", ActivityController.getAll);
 app.get("/activities/:id", ActivityController.getItem);
-app.delete("/activities/:id", checkAuth, ActivityController.remove);
+app.delete(
+  "/activities/:id",
+  checkAuth,
+  checkAdmin,
+  ActivityController.remove,
+);
 app.patch(
   "/activities/:id",
   checkAuth,
+  checkAdmin,
   activityCreateValidation,
   ActivityController.update,
 );
