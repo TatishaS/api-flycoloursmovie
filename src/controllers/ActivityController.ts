@@ -86,7 +86,6 @@ export const update = async (req: Request, res: Response) => {
         _id: activityId,
       },
       {
-        user: req.userId,
         title: req.body.title,
         description: req.body.description,
         imageUrl: req.body.imageUrl,
@@ -99,7 +98,8 @@ export const update = async (req: Request, res: Response) => {
         price: req.body.price,
         duration: req.body.duration,
         occupiedSeats: req.body.occupiedSeats,
-      }
+      },
+      { new: true },
     ).exec();
 
     if (!activity) {
@@ -108,11 +108,7 @@ export const update = async (req: Request, res: Response) => {
       });
     }
 
-    //const booking = await bookingDoc.save();
-
-    res.json({
-      success: true,
-    });
+    res.json(activity);
   } catch (error) {
     console.log(error);
     res.status(500).json({

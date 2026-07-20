@@ -98,7 +98,7 @@ export const update = async (req: Request, res: Response) => {
       });
     }
 
-    await BookingModel.findOneAndUpdate(
+    const booking = await BookingModel.findOneAndUpdate(
       {
         _id: bookingId,
       },
@@ -106,12 +106,11 @@ export const update = async (req: Request, res: Response) => {
         seats: req.body.seats,
         activity: req.body.activity,
         activityDate: req.body.activityDate,
-      }
+      },
+      { new: true },
     ).exec();
 
-    res.json({
-      success: true,
-    });
+    res.json(booking);
   } catch (error) {
     console.log(error);
     res.status(500).json({

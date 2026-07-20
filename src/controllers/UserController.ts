@@ -139,6 +139,7 @@ export const update = async (req: Request, res: Response) => {
         email: req.body.email,
         group: req.body.group,
       },
+      { new: true },
     ).exec();
 
     if (!user) {
@@ -147,9 +148,8 @@ export const update = async (req: Request, res: Response) => {
       });
     }
 
-    res.json({
-      success: true,
-    });
+    const { passwordHash, ...userData } = user.toObject();
+    res.json(userData);
   } catch (error) {
     console.log(error);
     res.status(500).json({
