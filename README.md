@@ -1,0 +1,1 @@
+The project was originally bootstrapped as a simple Express / Node.js API for a tickets booking system for language school events. Now the codebase is being refactored to implement cleaner architecture standards.
