@@ -7,6 +7,7 @@ import path from "path";
 import crypto from "crypto";
 import cors from "cors";
 import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import { setupDocs } from "./utils/documentation";
 
 import {
@@ -55,11 +56,10 @@ mongoose
 
 const app = express();
 
-const ALLOWED_IMAGE_TYPES = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-]);
+// For Onrender , so express-rate-limit reads the real client IP from X-Forwarded-For instead of the proxy's IP.
+app.set("trust proxy", 1);
+
+const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 const storage = multer.diskStorage({
   destination: (_, __, callback) => {
@@ -92,6 +92,14 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
 });
 
+const loginRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "Too many login attempts, please try again later" },
+});
+
 app.use(express.json());
 app.use(cors());
 app.use(helmet());
@@ -118,7 +126,7 @@ app.get("/", (req: Request, res: Response) => {
 
 app.post(
   "/auth/login",
-
+  loginRateLimit,
   loginValidation,
   checkValidationErrors,
   UserController.login,
@@ -223,12 +231,7 @@ app.post(
 );
 app.get("/activities", ActivityController.getAll);
 app.get("/activities/:id", ActivityController.getItem);
-app.delete(
-  "/activities/:id",
-  checkAuth,
-  checkAdmin,
-  ActivityController.remove,
-);
+app.delete("/activities/:id", checkAuth, checkAdmin, ActivityController.remove);
 app.patch(
   "/activities/:id",
   checkAuth,
