@@ -1,36 +1,18 @@
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 
-import UserModel from "../models/User";
+import * as userService from "../services/userService";
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const password = req.body.password;
-    const alg = await bcrypt.genSalt(10);
-    const passHash = await bcrypt.hash(password, alg);
-
-    const userDoc = new UserModel({
+    const { user, token } = await userService.registerUser({
       fullname: req.body.fullname,
       email: req.body.email,
-      passwordHash: passHash,
+      password: req.body.password,
       group: req.body.group,
-      role: "all_users",
     });
 
-    const user = await userDoc.save();
-
-    const token = jwt.sign(
-      { _id: user._id, role: user.role },
-      process.env.SECRET_KEY,
-      {
-        expiresIn: "30d",
-      },
-    );
-    const { passwordHash, ...userData } = user.toObject();
-
     res.json({
-      ...userData,
+      ...user,
       token,
     });
   } catch (error) {
@@ -43,40 +25,20 @@ export const register = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
   try {
-    const user = await UserModel.findOne({
-      email: req.body.email,
-    });
-
-    if (!user) {
-      return res.status(403).json({
-        message: "Invalid login or password",
-      });
-    }
-
-    const isPasswordValid = await bcrypt.compare(
+    const result = await userService.authenticateUser(
+      req.body.email,
       req.body.password,
-      user.passwordHash,
     );
 
-    if (!isPasswordValid) {
+    if (!result) {
       return res.status(403).json({
         message: "Invalid login or password",
       });
     }
-
-    const token = jwt.sign(
-      { _id: user._id, role: user.role },
-      process.env.SECRET_KEY,
-      {
-        expiresIn: "30d",
-      },
-    );
-
-    const { passwordHash, ...userData } = user.toObject();
 
     res.json({
-      ...userData,
-      token,
+      ...result.user,
+      token: result.token,
     });
   } catch (error) {
     return res.status(500).json({
@@ -87,7 +49,7 @@ export const login = async (req: Request, res: Response) => {
 
 export const authMe = async (req: Request, res: Response) => {
   try {
-    const user = await UserModel.findById(req.userId);
+    const user = await userService.getUserById(req.userId as string);
 
     if (!user) {
       return res.status(404).json({
@@ -95,8 +57,7 @@ export const authMe = async (req: Request, res: Response) => {
       });
     }
 
-    const { passwordHash, ...userData } = user.toObject();
-    res.json(userData);
+    res.json(user);
   } catch (error) {
     res.status(403).json({
       message: "Authorization failed",
@@ -106,12 +67,8 @@ export const authMe = async (req: Request, res: Response) => {
 
 export const getAll = async (req: Request, res: Response) => {
   try {
-    const users = await UserModel.find();
-    const usersData = users.map((user) => {
-      const { passwordHash, ...userData } = user.toObject();
-      return userData;
-    });
-    res.json(usersData);
+    const users = await userService.getAllUsers();
+    res.json(users);
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -130,17 +87,11 @@ export const update = async (req: Request, res: Response) => {
       });
     }
 
-    const user = await UserModel.findOneAndUpdate(
-      {
-        _id: userId,
-      },
-      {
-        fullname: req.body.fullname,
-        email: req.body.email,
-        group: req.body.group,
-      },
-      { new: true },
-    ).exec();
+    const user = await userService.updateUser(userId, {
+      fullname: req.body.fullname,
+      email: req.body.email,
+      group: req.body.group,
+    });
 
     if (!user) {
       return res.status(404).json({
@@ -148,8 +99,7 @@ export const update = async (req: Request, res: Response) => {
       });
     }
 
-    const { passwordHash, ...userData } = user.toObject();
-    res.json(userData);
+    res.json(user);
   } catch (error) {
     console.log(error);
     res.status(500).json({

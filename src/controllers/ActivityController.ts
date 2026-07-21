@@ -1,9 +1,10 @@
-import ActivityModel from "../models/Activity";
 import { Request, Response } from "express";
+
+import * as activityService from "../services/activityService";
 
 export const getAll = async (req: Request, res: Response) => {
   try {
-    const activities = await ActivityModel.find().populate("user").exec();
+    const activities = await activityService.getAllActivities();
     res.json(activities);
   } catch (error) {
     console.log(error);
@@ -16,7 +17,7 @@ export const getAll = async (req: Request, res: Response) => {
 export const getItem = async (req: Request, res: Response) => {
   try {
     const activityId = req.params.id;
-    const activity = await ActivityModel.findById(activityId).exec();
+    const activity = await activityService.getActivityById(activityId);
     res.json(activity);
   } catch (error) {
     console.log(error);
@@ -29,9 +30,7 @@ export const getItem = async (req: Request, res: Response) => {
 export const remove = async (req: Request, res: Response) => {
   try {
     const activityId = req.params.id;
-    const activity = await ActivityModel.findOneAndDelete({
-      _id: activityId,
-    }).exec();
+    const activity = await activityService.deleteActivity(activityId);
 
     if (!activity) {
       return res.status(404).json({
@@ -52,8 +51,8 @@ export const remove = async (req: Request, res: Response) => {
 
 export const create = async (req: Request, res: Response) => {
   try {
-    const activityDoc = new ActivityModel({
-      user: req.userId,
+    const activity = await activityService.createActivity({
+      userId: req.userId as string,
       title: req.body.title,
       description: req.body.description,
       imageUrl: req.body.imageUrl,
@@ -67,8 +66,6 @@ export const create = async (req: Request, res: Response) => {
       duration: req.body.duration,
     });
 
-    const activity = await activityDoc.save();
-
     res.json(activity);
   } catch (error) {
     console.log(error);
@@ -81,26 +78,20 @@ export const create = async (req: Request, res: Response) => {
 export const update = async (req: Request, res: Response) => {
   try {
     const activityId = req.params.id;
-    const activity = await ActivityModel.findOneAndUpdate(
-      {
-        _id: activityId,
-      },
-      {
-        title: req.body.title,
-        description: req.body.description,
-        imageUrl: req.body.imageUrl,
-        type: req.body.type,
-        originalLanguage: req.body.originalLanguage,
-        subtitlesLanguage: req.body.subtitlesLanguage,
-        date: req.body.date,
-        time: req.body.time,
-        free: req.body.free,
-        price: req.body.price,
-        duration: req.body.duration,
-        occupiedSeats: req.body.occupiedSeats,
-      },
-      { new: true },
-    ).exec();
+    const activity = await activityService.updateActivity(activityId, {
+      title: req.body.title,
+      description: req.body.description,
+      imageUrl: req.body.imageUrl,
+      type: req.body.type,
+      originalLanguage: req.body.originalLanguage,
+      subtitlesLanguage: req.body.subtitlesLanguage,
+      date: req.body.date,
+      time: req.body.time,
+      free: req.body.free,
+      price: req.body.price,
+      duration: req.body.duration,
+      occupiedSeats: req.body.occupiedSeats,
+    });
 
     if (!activity) {
       return res.status(404).json({

@@ -1,11 +1,10 @@
-import BookingModel from "../models/Booking";
 import { Request, Response } from "express";
+
+import * as bookingService from "../services/bookingService";
 
 export const getAll = async (req: Request, res: Response) => {
   try {
-    const bookings = await BookingModel.find()
-      .populate(["user", "activity"])
-      .exec();
+    const bookings = await bookingService.getAllBookings();
     res.json(bookings);
   } catch (error) {
     console.log(error);
@@ -18,7 +17,7 @@ export const getAll = async (req: Request, res: Response) => {
 export const getItem = async (req: Request, res: Response) => {
   try {
     const bookingId = req.params.id;
-    const booking = await BookingModel.findById(bookingId).exec();
+    const booking = await bookingService.getBookingById(bookingId);
     res.json(booking);
   } catch (error) {
     console.log(error);
@@ -31,7 +30,7 @@ export const getItem = async (req: Request, res: Response) => {
 export const remove = async (req: Request, res: Response) => {
   try {
     const bookingId = req.params.id;
-    const existing = await BookingModel.findById(bookingId).exec();
+    const existing = await bookingService.getBookingById(bookingId);
 
     if (!existing) {
       return res.status(404).json({
@@ -45,7 +44,7 @@ export const remove = async (req: Request, res: Response) => {
       });
     }
 
-    await BookingModel.findOneAndDelete({ _id: bookingId }).exec();
+    await bookingService.deleteBooking(bookingId);
 
     res.json({
       success: true,
@@ -60,17 +59,12 @@ export const remove = async (req: Request, res: Response) => {
 
 export const create = async (req: Request, res: Response) => {
   try {
-    const reservationsNum = await BookingModel.countDocuments();
-    const reservationNumber = reservationsNum + 1;
-    const bookingDoc = new BookingModel({
-      user: req.userId,
+    const booking = await bookingService.createBooking({
+      userId: req.userId as string,
       seats: req.body.seats,
       activity: req.body.activity,
       activityDate: req.body.activityDate,
-      reservationNumber,
     });
-
-    const booking = await bookingDoc.save();
 
     res.json(booking);
   } catch (error) {
@@ -84,7 +78,7 @@ export const create = async (req: Request, res: Response) => {
 export const update = async (req: Request, res: Response) => {
   try {
     const bookingId = req.params.id;
-    const existing = await BookingModel.findById(bookingId).exec();
+    const existing = await bookingService.getBookingById(bookingId);
 
     if (!existing) {
       return res.status(404).json({
@@ -98,17 +92,11 @@ export const update = async (req: Request, res: Response) => {
       });
     }
 
-    const booking = await BookingModel.findOneAndUpdate(
-      {
-        _id: bookingId,
-      },
-      {
-        seats: req.body.seats,
-        activity: req.body.activity,
-        activityDate: req.body.activityDate,
-      },
-      { new: true },
-    ).exec();
+    const booking = await bookingService.updateBooking(bookingId, {
+      seats: req.body.seats,
+      activity: req.body.activity,
+      activityDate: req.body.activityDate,
+    });
 
     res.json(booking);
   } catch (error) {
