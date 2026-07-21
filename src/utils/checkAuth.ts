@@ -1,9 +1,10 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
+import { UserRole } from "../types/user.types";
 
 interface CustomJwtPayload extends JwtPayload {
   _id: string;
-  role: string;
+  role: UserRole;
 }
 
 export default (req: Request, res: Response, next: NextFunction) => {

@@ -17,7 +17,11 @@ const UserSchema = new mongoose.Schema<IUser>(
       required: true,
     },
     group: String,
-    role: String,
+    role: {
+      type: String,
+      enum: ["all_users", "admin"],
+      default: "all_users",
+    },
     bookings: [String],
   },
   { timestamps: true }
