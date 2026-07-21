@@ -1,10 +1,10 @@
 import { body, check } from "express-validator";
 
 export const registerValidation = [
-  body("email", "Неверный формат e-mail").isEmail(),
+  body("email", "Invalid email format").isEmail(),
   check(
     "password",
-    "Длина пароля должна быть не менее 8 символов и содержать хотя бы 1 латинскую букву, цифры и специальные символы",
+    "Password must be at least 8 characters long and contain at least one letter, one number, and one special character",
   )
     .isString()
     .trim()
@@ -16,16 +16,16 @@ export const registerValidation = [
       minNumbers: 1,
       minSymbols: 1,
     }),
-  body("fullname", "Укажите верное имя").isString().trim().isLength({ min: 2 }),
-  body("group", "Неверный формат группы")
+  body("fullname", "Please enter a valid name").isString().trim().isLength({ min: 2 }),
+  body("group", "Invalid group format")
     .optional()
     .isString()
     .isLength({ min: 2, max: 10 }),
 ];
 
 export const loginValidation = [
-  body("email", "Неверный формат e-mail").isEmail(),
-  body("password", "Длина пароля должна быть не менее 8 символов")
+  body("email", "Invalid email format").isEmail(),
+  body("password", "Password must be at least 8 characters long")
     .trim()
     .isLength({
       min: 8,
@@ -33,19 +33,19 @@ export const loginValidation = [
 ];
 
 export const bookingCreateValidation = [
-  body("seats", "Выберите хотя бы одно место").isArray().isLength({ min: 1 }),
-  body("activityDate", "Выберите дату").notEmpty(),
-  body("activity", "Выберите фильм или событие").notEmpty(),
+  body("seats", "Select at least one seat").isArray().isLength({ min: 1 }),
+  body("activityDate", "Select a date").notEmpty(),
+  body("activity", "Select a movie or event").notEmpty(),
 ];
 
 export const activityCreateValidation = [
-  body("type", "Выберите тип активности").notEmpty(),
-  body("date", "Укажите дату мероприятия").isDate(),
-  body("title", "Укажите название").isString().isLength({
+  body("type", "Select an activity type").notEmpty(),
+  body("date", "Enter the activity date").isDate(),
+  body("title", "Enter a title").isString().isLength({
     min: 2,
   }),
-  body("imageUrl", "Неверная ссылка на изображение").isURL(),
-  body("description", "Длина описания должна быть от 10 до 350 символов")
+  body("imageUrl", "Invalid image URL").isURL(),
+  body("description", "Description must be between 10 and 350 characters")
     .isString()
     .isLength({
       min: 10,
@@ -54,13 +54,13 @@ export const activityCreateValidation = [
 ];
 
 export const activityUpdateValidation = [
-  body("type", "Выберите тип активности").optional().notEmpty(),
-  body("date", "Укажите дату мероприятия").optional().isDate(),
-  body("title", "Укажите название").optional().isString().isLength({
+  body("type", "Select an activity type").optional().notEmpty(),
+  body("date", "Enter the activity date").optional().isDate(),
+  body("title", "Enter a title").optional().isString().isLength({
     min: 2,
   }),
-  body("imageUrl", "Неверная ссылка на изображение").optional().isURL(),
-  body("description", "Длина описания должна быть от 10 до 350 символов")
+  body("imageUrl", "Invalid image URL").optional().isURL(),
+  body("description", "Description must be between 10 and 350 characters")
     .optional()
     .isString()
     .isLength({

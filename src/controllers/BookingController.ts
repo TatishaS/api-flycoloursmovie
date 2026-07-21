@@ -1,108 +1,67 @@
 import { Request, Response } from "express";
 
 import * as bookingService from "../services/bookingService";
+import { asyncHandler } from "../utils/asyncHandler";
+import { AppError } from "../utils/AppError";
 
-export const getAll = async (req: Request, res: Response) => {
-  try {
-    const bookings = await bookingService.getAllBookings();
-    res.json(bookings);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      message: "Не удалось получить брони",
-    });
+export const getAll = asyncHandler(async (req: Request, res: Response) => {
+  const bookings = await bookingService.getAllBookings();
+  res.json(bookings);
+});
+
+export const getItem = asyncHandler(async (req: Request, res: Response) => {
+  const bookingId = req.params.id;
+  const booking = await bookingService.getBookingById(bookingId);
+  res.json(booking);
+});
+
+export const remove = asyncHandler(async (req: Request, res: Response) => {
+  const bookingId = req.params.id;
+  const existing = await bookingService.getBookingById(bookingId);
+
+  if (!existing) {
+    throw new AppError(404, "Booking not found");
   }
-};
 
-export const getItem = async (req: Request, res: Response) => {
-  try {
-    const bookingId = req.params.id;
-    const booking = await bookingService.getBookingById(bookingId);
-    res.json(booking);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      message: "Не удалось получить данные бронирования",
-    });
+  if (existing.user.toString() !== req.userId && req.userRole !== "admin") {
+    throw new AppError(403, "You can only delete your own bookings");
   }
-};
 
-export const remove = async (req: Request, res: Response) => {
-  try {
-    const bookingId = req.params.id;
-    const existing = await bookingService.getBookingById(bookingId);
+  await bookingService.deleteBooking(bookingId);
 
-    if (!existing) {
-      return res.status(404).json({
-        message: "Бронирование не найдено",
-      });
-    }
+  res.json({
+    success: true,
+  });
+});
 
-    if (existing.user.toString() !== req.userId && req.userRole !== "admin") {
-      return res.status(403).json({
-        message: "Вы можете удалять только свои бронирования",
-      });
-    }
+export const create = asyncHandler(async (req: Request, res: Response) => {
+  const booking = await bookingService.createBooking({
+    userId: req.userId as string,
+    seats: req.body.seats,
+    activity: req.body.activity,
+    activityDate: req.body.activityDate,
+  });
 
-    await bookingService.deleteBooking(bookingId);
+  res.json(booking);
+});
 
-    res.json({
-      success: true,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      message: "Не удалось удалить бронирование",
-    });
+export const update = asyncHandler(async (req: Request, res: Response) => {
+  const bookingId = req.params.id;
+  const existing = await bookingService.getBookingById(bookingId);
+
+  if (!existing) {
+    throw new AppError(404, "Booking not found");
   }
-};
 
-export const create = async (req: Request, res: Response) => {
-  try {
-    const booking = await bookingService.createBooking({
-      userId: req.userId as string,
-      seats: req.body.seats,
-      activity: req.body.activity,
-      activityDate: req.body.activityDate,
-    });
-
-    res.json(booking);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      message: "Не удалось забронировать места",
-    });
+  if (existing.user.toString() !== req.userId && req.userRole !== "admin") {
+    throw new AppError(403, "You can only update your own bookings");
   }
-};
 
-export const update = async (req: Request, res: Response) => {
-  try {
-    const bookingId = req.params.id;
-    const existing = await bookingService.getBookingById(bookingId);
+  const booking = await bookingService.updateBooking(bookingId, {
+    seats: req.body.seats,
+    activity: req.body.activity,
+    activityDate: req.body.activityDate,
+  });
 
-    if (!existing) {
-      return res.status(404).json({
-        message: "Бронирование не найдено",
-      });
-    }
-
-    if (existing.user.toString() !== req.userId && req.userRole !== "admin") {
-      return res.status(403).json({
-        message: "Вы можете изменять только свои бронирования",
-      });
-    }
-
-    const booking = await bookingService.updateBooking(bookingId, {
-      seats: req.body.seats,
-      activity: req.body.activity,
-      activityDate: req.body.activityDate,
-    });
-
-    res.json(booking);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      message: "Не удалось обновить бронирование",
-    });
-  }
-};
+  res.json(booking);
+});

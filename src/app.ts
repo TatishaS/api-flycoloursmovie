@@ -8,6 +8,7 @@ import bookingRoutes from "./routes/bookingRoutes";
 import activityRoutes from "./routes/activityRoutes";
 import userRoutes from "./routes/userRoutes";
 import uploadRoutes from "./routes/uploadRoutes";
+import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
 
 const app = express();
 
@@ -43,5 +44,8 @@ app.use("/bookings", bookingRoutes);
 app.use("/activities", activityRoutes);
 app.use("/users", userRoutes);
 app.use("/upload", uploadRoutes);
+
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 export default app;

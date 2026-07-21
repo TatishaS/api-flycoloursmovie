@@ -29,6 +29,6 @@ router.patch(
   bookingCreateValidation,
   checkValidationErrors,
   BookingController.update,
-); // Возможно, функция не нужна
+);
 
 export default router;

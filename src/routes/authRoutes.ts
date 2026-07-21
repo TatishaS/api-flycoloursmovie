@@ -22,8 +22,8 @@ router.post(
  *   post:
  *     tags:
  *       - User Routes
- *     summary: Регистрация нового пользователя
- *     description: Берет данные пользователя из body и пытается зарегистировать нового пользователя в базе
+ *     summary: Register a new user
+ *     description: Takes user data from the request body and attempts to register a new user in the database
  *     requestBody:
  *       required: true
  *       content:
