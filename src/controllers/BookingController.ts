@@ -3,19 +3,23 @@ import { Request, Response } from "express";
 import * as bookingService from "../services/bookingService";
 import { asyncHandler } from "../utils/asyncHandler";
 import { AppError } from "../utils/AppError";
+import {
+  CreateBookingRequestBody,
+  UpdateBookingRequestBody,
+} from "../types/booking.types";
 
 export const getAll = asyncHandler(async (req: Request, res: Response) => {
   const bookings = await bookingService.getAllBookings();
   res.json(bookings);
 });
 
-export const getItem = asyncHandler(async (req: Request, res: Response) => {
+export const getItem = asyncHandler<{ id: string }>(async (req, res) => {
   const bookingId = req.params.id;
   const booking = await bookingService.getBookingById(bookingId);
   res.json(booking);
 });
 
-export const remove = asyncHandler(async (req: Request, res: Response) => {
+export const remove = asyncHandler<{ id: string }>(async (req, res) => {
   const bookingId = req.params.id;
   const existing = await bookingService.getBookingById(bookingId);
 
@@ -34,7 +38,11 @@ export const remove = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-export const create = asyncHandler(async (req: Request, res: Response) => {
+export const create = asyncHandler<
+  Record<string, never>,
+  unknown,
+  CreateBookingRequestBody
+>(async (req, res) => {
   const booking = await bookingService.createBooking({
     userId: req.userId as string,
     seats: req.body.seats,
@@ -45,7 +53,11 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
   res.json(booking);
 });
 
-export const update = asyncHandler(async (req: Request, res: Response) => {
+export const update = asyncHandler<
+  { id: string },
+  unknown,
+  UpdateBookingRequestBody
+>(async (req, res) => {
   const bookingId = req.params.id;
   const existing = await bookingService.getBookingById(bookingId);
 

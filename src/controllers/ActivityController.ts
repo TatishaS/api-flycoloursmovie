@@ -3,19 +3,23 @@ import { Request, Response } from "express";
 import * as activityService from "../services/activityService";
 import { asyncHandler } from "../utils/asyncHandler";
 import { AppError } from "../utils/AppError";
+import {
+  CreateActivityRequestBody,
+  UpdateActivityRequestBody,
+} from "../types/activity.types";
 
 export const getAll = asyncHandler(async (req: Request, res: Response) => {
   const activities = await activityService.getAllActivities();
   res.json(activities);
 });
 
-export const getItem = asyncHandler(async (req: Request, res: Response) => {
+export const getItem = asyncHandler<{ id: string }>(async (req, res) => {
   const activityId = req.params.id;
   const activity = await activityService.getActivityById(activityId);
   res.json(activity);
 });
 
-export const remove = asyncHandler(async (req: Request, res: Response) => {
+export const remove = asyncHandler<{ id: string }>(async (req, res) => {
   const activityId = req.params.id;
   const activity = await activityService.deleteActivity(activityId);
 
@@ -28,7 +32,11 @@ export const remove = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-export const create = asyncHandler(async (req: Request, res: Response) => {
+export const create = asyncHandler<
+  Record<string, never>,
+  unknown,
+  CreateActivityRequestBody
+>(async (req, res) => {
   const activity = await activityService.createActivity({
     userId: req.userId as string,
     title: req.body.title,
@@ -47,7 +55,11 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
   res.json(activity);
 });
 
-export const update = asyncHandler(async (req: Request, res: Response) => {
+export const update = asyncHandler<
+  { id: string },
+  unknown,
+  UpdateActivityRequestBody
+>(async (req, res) => {
   const activityId = req.params.id;
   const activity = await activityService.updateActivity(activityId, {
     title: req.body.title,

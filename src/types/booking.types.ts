@@ -7,3 +7,15 @@ export interface IBooking {
   activityDate: string;
   reservationNumber: string;
 }
+
+export interface CreateBookingRequestBody {
+  seats: string[];
+  activity: string;
+  activityDate: string;
+}
+
+export interface UpdateBookingRequestBody {
+  seats?: string[];
+  activity?: string;
+  activityDate?: string;
+}
