@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
+import { IBooking } from "../types/booking.types";
 
-const BookingSchema = new mongoose.Schema(
+const BookingSchema = new mongoose.Schema<IBooking>(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -8,12 +9,12 @@ const BookingSchema = new mongoose.Schema(
       required: true,
     },
     seats: {
-      type: Array,
+      type: [String],
       required: true,
     },
     activity: {
       type: mongoose.Schema.Types.ObjectId,
-    ref: "Activity",
+      ref: "Activity",
       required: true,
     },
     activityDate: {
@@ -23,10 +24,10 @@ const BookingSchema = new mongoose.Schema(
     reservationNumber: {
       type: String,
       required: true,
-      default: 0,
+      default: "0",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model("Booking", BookingSchema);

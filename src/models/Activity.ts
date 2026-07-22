@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
+import { IActivity } from "../types/activity.types";
 
-const ActivitySchema = new mongoose.Schema(
+const ActivitySchema = new mongoose.Schema<IActivity>(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -50,7 +51,7 @@ const ActivitySchema = new mongoose.Schema(
       default: 0,
     },
     occupiedSeats: {
-      type: Array,
+      type: [String],
       default: [],
     },
   },

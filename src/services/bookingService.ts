@@ -15,7 +15,7 @@ export const createBooking = async (data: {
   activityDate: string;
 }) => {
   const reservationsNum = await BookingModel.countDocuments();
-  const reservationNumber = reservationsNum + 1;
+  const reservationNumber = String(reservationsNum + 1);
 
   const bookingDoc = new BookingModel({
     user: data.userId,

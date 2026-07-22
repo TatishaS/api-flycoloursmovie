@@ -1,18 +1,17 @@
-interface ActivityResult<T> {
-  _doc: T;
-}
+import { Types } from "mongoose";
 
-export interface IActivity extends ActivityResult<IActivity> {
-  user: string;
+export interface IActivity {
+  user: Types.ObjectId;
   type: string;
   title: string;
   description: string;
   imageUrl: string;
-  originalLanguage: string;
-  subtitlesLanguage: string;
+  originalLanguage?: string;
+  subtitlesLanguage?: string;
   date: string;
   time: string;
   free: boolean;
   price: number;
+  duration: number;
   occupiedSeats: string[];
 }
