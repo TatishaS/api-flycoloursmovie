@@ -41,6 +41,43 @@ const upload = multer({
 
 const router = Router();
 
+/**
+ * @swagger
+ * /upload:
+ *   post:
+ *     tags:
+ *       - Upload
+ *     summary: Upload an image file
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Uploaded file URL
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 url:
+ *                   type: string
+ *       403:
+ *         description: No access
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/Error"
+ */
+
 router.post("/", checkAuth, upload.single("image"), (req, res) => {
   res.json({
     url: `/uploads/${req.file?.filename}`,
