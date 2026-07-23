@@ -38,7 +38,7 @@ const router = Router();
  *         content:
  *           application/json:
  *             schema:
- *               $ref: "#/components/schemas/Error"
+ *               $ref: "#/components/schemas/ValidationError"
  *       403:
  *         description: No access / admin access required
  *         content:
@@ -124,6 +124,10 @@ router.get("/:id", ActivityController.getItem);
  *     responses:
  *       200:
  *         description: Activity deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/SuccessResponse"
  *       403:
  *         description: No access / admin access required
  *         content:
@@ -173,7 +177,7 @@ router.delete("/:id", checkAuth, checkAdmin, ActivityController.remove);
  *         content:
  *           application/json:
  *             schema:
- *               $ref: "#/components/schemas/Error"
+ *               $ref: "#/components/schemas/ValidationError"
  *       403:
  *         description: No access / admin access required
  *         content:

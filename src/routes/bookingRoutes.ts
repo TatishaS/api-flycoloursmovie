@@ -35,7 +35,7 @@ const router = Router();
  *         content:
  *           application/json:
  *             schema:
- *               $ref: "#/components/schemas/Error"
+ *               $ref: "#/components/schemas/ValidationError"
  *       403:
  *         description: No access
  *         content:
@@ -136,6 +136,10 @@ router.get("/:id", checkAuth, BookingController.getItem);
  *     responses:
  *       200:
  *         description: Booking deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/SuccessResponse"
  *       403:
  *         description: No access
  *         content:
@@ -185,7 +189,7 @@ router.delete("/:id", checkAuth, BookingController.remove);
  *         content:
  *           application/json:
  *             schema:
- *               $ref: "#/components/schemas/Error"
+ *               $ref: "#/components/schemas/ValidationError"
  *       403:
  *         description: No access
  *         content:

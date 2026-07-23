@@ -34,7 +34,13 @@ const router = Router();
  *                     token:
  *                       type: string
  *       400:
- *         description: Validation error or invalid credentials
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/ValidationError"
+ *       403:
+ *         description: Invalid login or password
  *         content:
  *           application/json:
  *             schema:
@@ -79,7 +85,7 @@ router.post(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: "#/components/schemas/Error"
+ *               $ref: "#/components/schemas/ValidationError"
  */
 
 router.post(

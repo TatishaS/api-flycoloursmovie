@@ -178,6 +178,25 @@ export function setupDocs(app: Application) {
             message: { type: "string" },
           },
         },
+        ValidationError: {
+          type: "array",
+          description: "One item per one invalid field in the request",
+          items: {
+            type: "object",
+            properties: {
+              type: { type: "string" },
+              msg: { type: "string" },
+              path: { type: "string" },
+              location: { type: "string" },
+            },
+          },
+        },
+        SuccessResponse: {
+          type: "object",
+          properties: {
+            success: { type: "boolean" },
+          },
+        },
       },
     },
   };
