@@ -27,10 +27,10 @@ export function setupDocs(app: Application) {
     ],
     components: {
       securitySchemes: {
-        ApiKeyAuth: {
-          type: "apiKey",
-          in: "header",
-          name: "token",
+        BearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
         },
       },
       schemas: {
@@ -74,18 +74,108 @@ export function setupDocs(app: Application) {
         User: {
           type: "object",
           properties: {
-            id: { type: "string" },
+            _id: { type: "string" },
             fullname: { type: "string" },
             email: { type: "string" },
-            passwordHash: { type: "string" },
             group: { type: "string" },
-            role: { type: "string" },
+            role: { type: "string", enum: ["all_users", "admin"] },
             bookings: {
               type: "array",
               items: {
                 $ref: "#/components/schemas/Booking",
               },
             },
+            createdAt: { type: "string" },
+            updatedAt: { type: "string" },
+          },
+        },
+        RegisterRequest: {
+          type: "object",
+          required: ["fullname", "email", "password"],
+          properties: {
+            fullname: { type: "string", minLength: 2 },
+            email: { type: "string", format: "email" },
+            password: {
+              type: "string",
+              minLength: 8,
+              maxLength: 20,
+              description:
+                "Must contain at least one uppercase letter, one lowercase letter, one number, and one symbol",
+            },
+            group: { type: "string", minLength: 2, maxLength: 10 },
+          },
+        },
+        LoginRequest: {
+          type: "object",
+          required: ["email", "password"],
+          properties: {
+            email: { type: "string", format: "email" },
+            password: { type: "string", minLength: 8 },
+          },
+        },
+        UpdateUserRequest: {
+          type: "object",
+          properties: {
+            fullname: { type: "string" },
+            email: { type: "string", format: "email" },
+            group: { type: "string" },
+          },
+        },
+        CreateActivityRequest: {
+          type: "object",
+          required: ["type", "title", "description", "imageUrl", "date", "time"],
+          properties: {
+            type: { type: "string" },
+            title: { type: "string", minLength: 2 },
+            description: { type: "string", minLength: 10, maxLength: 350 },
+            imageUrl: { type: "string", format: "uri" },
+            originalLanguage: { type: "string" },
+            subtitlesLanguage: { type: "string" },
+            date: { type: "string", format: "date" },
+            time: { type: "string" },
+            free: { type: "boolean" },
+            price: { type: "number" },
+            duration: { type: "number" },
+          },
+        },
+        UpdateActivityRequest: {
+          type: "object",
+          properties: {
+            type: { type: "string" },
+            title: { type: "string", minLength: 2 },
+            description: { type: "string", minLength: 10, maxLength: 350 },
+            imageUrl: { type: "string", format: "uri" },
+            originalLanguage: { type: "string" },
+            subtitlesLanguage: { type: "string" },
+            date: { type: "string", format: "date" },
+            time: { type: "string" },
+            free: { type: "boolean" },
+            price: { type: "number" },
+            duration: { type: "number" },
+            occupiedSeats: { type: "array", items: { type: "string" } },
+          },
+        },
+        CreateBookingRequest: {
+          type: "object",
+          required: ["seats", "activity", "activityDate"],
+          properties: {
+            seats: { type: "array", items: { type: "string" }, minItems: 1 },
+            activity: { type: "string", description: "Activity id" },
+            activityDate: { type: "string", format: "date" },
+          },
+        },
+        UpdateBookingRequest: {
+          type: "object",
+          properties: {
+            seats: { type: "array", items: { type: "string" } },
+            activity: { type: "string", description: "Activity id" },
+            activityDate: { type: "string", format: "date" },
+          },
+        },
+        Error: {
+          type: "object",
+          properties: {
+            message: { type: "string" },
           },
         },
       },
